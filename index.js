@@ -7,7 +7,7 @@ const port = process.env.PORT || 9000;
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://localhost:5173", "http://localhost:5174","https://user-email-passwoed-auth.web.app","https://user-email-passwoed-auth.firebaseapp.com"],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -54,7 +54,7 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
