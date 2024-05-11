@@ -32,6 +32,19 @@ async function run() {
     // await client.connect();
 
     const booksCollection = client.db("libraryRoom").collection("books");
+    const categoryCollection = client.db("libraryRoom").collection("booksCategory");
+
+    // Get all books data from DB
+    app.get("/books", async (req, res) => {
+        const result = await booksCollection.find().toArray();
+        res.send(result);
+      });
+
+    // Get all category data from DB
+    app.get("/category", async (req, res) => {
+        const result = await categoryCollection.find().toArray();
+        res.send(result);
+      });
 
     // Save a book data in db
     app.post("/book", async (req, res) => {
