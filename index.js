@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 9000;
 
@@ -43,11 +43,13 @@ async function run() {
     const categoryCollection = client
       .db("libraryRoom")
       .collection("booksCategory");
+    const borrowCollection = client
+      .db("libraryRoom")
+      .collection("borrow");
 
     // jwt generate
     app.post("/jwt", async (req, res) => {
       const user = req.body;
-      console.log(user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "7d",
       });
@@ -64,6 +66,20 @@ async function run() {
     app.get("/books", async (req, res) => {
       const result = await booksCollection.find().toArray();
       res.send(result);
+    });
+
+    // Get all borrow books data from DB
+    app.get("/borrow", async (req, res) => {
+      const result = await borrowCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Get all books data by id from DB
+    app.get("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const book = await booksCollection.findOne(query);
+      res.send(book);
     });
 
     // Get all category data from DB
@@ -87,18 +103,26 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/borrow", async (req, res) => {
+      const bookData = req.body;
+      const result = await borrowCollection.insertOne(bookData);
+      res.send(result);
+    });
+
     // Get all books data from DB for pagination
     app.get("/all-books", async (req, res) => {
       const size = parseInt(req.query.size);
       const page = parseInt(req.query.page) - 1;
       const filter = req.query.filter;
       const sort = req.query.sort;
-      console.log(size, page, filter,sort);
       let query = {};
       if (filter) query = { category: filter };
 
+      let options = {};
+      if (sort) options = { sort: { rating: sort === 'ascending' ? 1 : -1 } };
+
       const result = await booksCollection
-        .find(query)
+        .find(query, options)
         .skip(page * size)
         .limit(size)
         .toArray();
