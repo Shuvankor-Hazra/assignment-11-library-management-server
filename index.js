@@ -87,22 +87,35 @@ async function run() {
       res.send(result);
     });
 
-    
     // Get all books data from DB for pagination
     app.get("/all-books", async (req, res) => {
-      const result = await booksCollection.find().toArray();
+      const size = parseInt(req.query.size);
+      const page = parseInt(req.query.page) - 1;
+      const filter = req.query.filter;
+      const sort = req.query.sort;
+      console.log(size, page, filter,sort);
+      let query = {};
+      if (filter) query = { category: filter };
+
+      const result = await booksCollection
+        .find(query)
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       res.send(result);
     });
 
     // Get all books data count from DB
     app.get("/books-count", async (req, res) => {
-      const count = await booksCollection.countDocuments();
-      res.send({count});
-      
+      const filter = req.query.filter;
+      let query = {};
+      if (filter) query = { category: filter };
+      const count = await booksCollection.countDocuments(query);
+      res.send({ count });
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
