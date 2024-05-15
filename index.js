@@ -43,9 +43,7 @@ async function run() {
     const categoryCollection = client
       .db("libraryRoom")
       .collection("booksCategory");
-    const borrowCollection = client
-      .db("libraryRoom")
-      .collection("borrow");
+    const borrowCollection = client.db("libraryRoom").collection("borrow");
 
     // jwt generate
     app.post("/jwt", async (req, res) => {
@@ -69,7 +67,7 @@ async function run() {
     });
 
     // Get all borrow books data from DB
-    app.get("/borrow", async (req, res) => {
+    app.get("/borrow/:email", async (req, res) => {
       const result = await borrowCollection.find().toArray();
       res.send(result);
     });
@@ -103,6 +101,7 @@ async function run() {
       res.send(result);
     });
 
+    // Save a book data in borrow db
     app.post("/borrow", async (req, res) => {
       const bookData = req.body;
       const result = await borrowCollection.insertOne(bookData);
@@ -117,10 +116,8 @@ async function run() {
       const sort = req.query.sort;
       let query = {};
       if (filter) query = { category: filter };
-
       let options = {};
-      if (sort) options = { sort: { rating: sort === 'ascending' ? 1 : -1 } };
-
+      if (sort) options = { sort: { rating: sort === "ascending" ? 1 : -1 } };
       const result = await booksCollection
         .find(query, options)
         .skip(page * size)
@@ -136,6 +133,14 @@ async function run() {
       if (filter) query = { category: filter };
       const count = await booksCollection.countDocuments(query);
       res.send({ count });
+    });
+
+    // Delete a book data from DB
+    app.delete("/borrow/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await borrowCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
