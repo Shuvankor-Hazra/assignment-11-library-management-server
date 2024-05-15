@@ -110,10 +110,10 @@ async function run() {
     });
 
     // Get data by category from DB
-    // app.get("/books/:cat", async (req, res) => {
+    // app.get("/category/:cat", async (req, res) => {
     //   const query = req.params.category;
     //   console.log(query);
-    //   const result = await booksCollection.find().toArray();
+    //   const result = await booksCollection.filter().toArray();
     //   res.send(result);
     // });
 
