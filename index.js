@@ -101,6 +101,14 @@ async function run() {
       res.send(result);
     });
 
+    // Delete a book data from DB
+    app.delete("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await booksCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // Get data by category from DB
     // app.get("/books/:cat", async (req, res) => {
     //   const query = req.params.category;
@@ -150,7 +158,7 @@ async function run() {
       res.send({ count });
     });
 
-    // Delete a book data from DB
+    // Delete a borrow book data from DB
     app.delete("/borrow/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
