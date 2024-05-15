@@ -86,6 +86,21 @@ async function run() {
       res.send(result);
     });
 
+    // Update a book data in db
+    app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const bookData = req.body;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...bookData,
+        },
+      };
+      const result = await booksCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
+
     // Get data by category from DB
     // app.get("/books/:cat", async (req, res) => {
     //   const query = req.params.category;
